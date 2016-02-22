@@ -39,10 +39,10 @@ class UR5_Benchmark():
         
         #Configuration settings
 
-        self.scenes = ["scene_1","scene_2","scene_3"]
-        self.planners = ["RRTC","BiTRRT","KPIECE1","BKPIECE1","BITstar_stop","RRT"]
-        self.planners = ["RRTC"]
-        self.plan_iterations = 1
+        self.scenes = ["scene_4"]
+        self.planners = ["BITstar_stop","BITstar_smac"]
+        self.planners = ["KPIECE","KPIECE_smac"]
+        self.plan_iterations = 30
              
         #Object Publishers, can alsu use PlanningSceneInterface, but this doesn throw any warnings
         self.object_publisher = rospy.Publisher('/collision_object',
@@ -136,7 +136,7 @@ class UR5_Benchmark():
                     
             self.results[x1] = scene                            #add scene dict to results dict
     	    
-            with open('files/benchmark_data.p', 'wb') as fp:    #store this scene's data
+            with open('results/benchmark_data.p', 'wb') as fp:    #store this scene's data
                 	pickle.dump(self.results, fp)                
             self.clear_env()
     
@@ -341,12 +341,12 @@ if __name__ == "__main__":
 
     # ur.load_env("scene_1")
     
-    data_string = 'files/bm_' + str(dt.now().month) + '.' + str(dt.now().day) + '_' + str(dt.now().hour) + '.' + str(dt.now().minute) + '_' + str(ur.plan_iterations) + '.p'
+    data_string = 'results/bm_' + str(dt.now().month) + '.' + str(dt.now().day) + '_' + str(dt.now().hour) + '.' + str(dt.now().minute) + '_' + str(ur.plan_iterations) + '.p'
 
     with open(data_string, 'wb') as fp:    #final data store
         pickle.dump(ur.results, fp)
 
-    with open('files/benchmark_data.p', 'wb') as fp:    #final data store
+    with open('results/benchmark_data.p', 'wb') as fp:    #final data store
         pickle.dump(ur.results, fp)
         
     moveit_commander.roscpp_shutdown()

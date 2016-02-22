@@ -210,7 +210,7 @@ def plot(scenenr, regex):
 if len(sys.argv) > 1:
     load_string = sys.argv[1]
 else:
-    load_string = "files/benchmark_data.p"
+    load_string = "results/benchmark_data.p"
 
 
 data = pickle.load(open(load_string, "rb" ))
