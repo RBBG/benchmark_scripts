@@ -132,7 +132,7 @@ def plot(scenenr, regex):
 		if (planners[x]!="" and regex in planners[x]):
 			axarr[0,0].bar(xdat[x],df[scenenr][x][1][:], 
 				width = bar_width, 
-				color = bar_colors[x%6],
+				color = bar_colors[x],
 				label = planners[x])
 
 	axarr[0,0].set_xlabel('Problems')
@@ -146,10 +146,7 @@ def plot(scenenr, regex):
 	axarr[0,1].set_title(r'Workspace Length')
 	for x in xrange(n):
 		if (planners[x]!="" and regex in planners[x]):
-			axarr[0,1].bar(xdat[x],df[scenenr][x][2][:], 
-				width = bar_width, 
-				color = bar_colors[x%6],
-				label = planners[x])
+			axarr[0,1].bar(xdat[x],df[scenenr][x][2][:], width = bar_width, color = bar_colors[x],label=planners[x])
 
 	axarr[0,1].set_xlabel('Problems')
 	axarr[0,1].set_ylabel('2-norm in workspace')	
@@ -164,10 +161,7 @@ def plot(scenenr, regex):
 	axarr[1,0].set_title(r'Percentage Solved')
 	for x in xrange(len(planners)):
 		if (planners[x]!="" and regex in planners[x]): 			
-			axarr[1,0].bar(xdat[x],df[scenenr][x][3][:], 
-				width = bar_width, 
-				color = bar_colors[x%6],
-				label = planners[x])
+			axarr[1,0].bar(xdat[x],df[scenenr][x][3][:], width = bar_width, color = bar_colors[x],label=planners[x])
 
 	axarr[1,0].set_xlabel('Problems')
 	axarr[1,0].set_ylabel('Percentage solved')
@@ -191,7 +185,7 @@ def plot(scenenr, regex):
 			axarr[1,1].bar(xdat[x],plot_data,
 				yerr = error,
 				width = bar_width,
-				color = bar_colors[x%6],
+				color = bar_colors[x],
 				label = planners[x])
 			
 
@@ -212,6 +206,12 @@ def plot(scenenr, regex):
 
 	axarr[1,1].legend(bbox_to_anchor=(1.02, 1),loc=2, borderaxespad=0.)
 
+def print_dat(scenenr, regex):
+	n = len(planners)
+	for x in xrange(n):
+		frac = sum(df[scenenr][x][0][:])/sum(df[scenenr][0][0][:])
+		print planners[x] + ": " + str(sum(df[scenenr][x][0][:]))
+
 
 if len(sys.argv) > 1:
     load_string = sys.argv[1]
@@ -223,6 +223,6 @@ data = pickle.load(open(load_string, "rb" ))
 
 (df,planners) = unfold(data)
 for x in xrange(len(df)):
-	plot(x,"")
+	print_dat(x,"")
 
 plt.show()
