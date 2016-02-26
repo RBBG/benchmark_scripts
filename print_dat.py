@@ -53,7 +53,7 @@ def unfold(data):
 						"""
 						
 						totaltime = data[scene][query][planner][iteration]['path'].joint_trajectory.header.seq
-						totaltime += data[scene][query][planner][iteration]['path'].joint_trajectory.header.stamp.secs	
+						totaltime += data[scene][query][planner][iteration]['path'].joint_trajectory.header.stamp.secs
 
 						time.append(totaltime)
 						plantime.append(data[scene][query][planner][iteration]['path'].joint_trajectory.header.seq)
@@ -207,11 +207,15 @@ def plot(scenenr, regex):
 	axarr[1,1].legend(bbox_to_anchor=(1.02, 1),loc=2, borderaxespad=0.)
 
 def print_dat(scenenr, regex):
+	
 	n = len(planners)
+	print len(df[scenenr][0][0][:])
 	for x in xrange(n):
 		frac = sum(df[scenenr][x][0][:])/sum(df[scenenr][0][0][:])
-		print planners[x] + ": " + str(sum(df[scenenr][x][0][:]))
-
+		
+		print planners[x] + " totaltime: " + str(sum(df[scenenr][x][0][:])/len(df[scenenr][x][0][:]))
+		print planners[x] + " avg percentage: " + str(sum(df[scenenr][x][3][:])/len(df[scenenr][x][3][:]))
+		print planners[x] + " avg jointspace length: " + str(sum(df[scenenr][x][1][:])/len(df[scenenr][x][1][:]))
 
 if len(sys.argv) > 1:
     load_string = sys.argv[1]

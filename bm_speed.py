@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 class UR5_Benchmark():
         
     PUBLISHER_DELAY = 0.02 # max. 50 topics per second
-    PLANNING_TIME = 1 # second, 
+    PLANNING_TIME = 2 # second, 
 
     # ********************************************************************* #
     #    
@@ -39,14 +39,21 @@ class UR5_Benchmark():
         
         #Configuration settings
 
-        self.scenes = ["scene_4"]
+        self.scenes = ["scene_7"]
         self.planners = ["BITstar_stop","BITstar_smac"]
         self.planners = ["RRTC_smac","BiTRRT_smac","BITstar_smac","BKPIECE_smac","KPIECE_smac2"]
         self.planners = ["KPIECE","KPIECE_smac","KPIECE_smac2"]
 
         self.planners = ["RRTC","RRTC_smac","RRTC_smac2","BiTRRT","BiTRRT_smac","BiTRRT_smac2","BITstar_stop","BITstar_smac","BITstar_smac2","BKPIECE","BKPIECE_smac","BKPIECE_smac2","KPIECE","KPIECE_smac","KPIECE_smac2"]
+        
+        self.planners = ["KPIECE","KPIECE_smac"]
+        self.planners = ["BITstar_stop","BITstar_smac"]
+        self.planners = ["BKPIECE","BKPIECE_smac"]
+        self.planners = ["BiTRRT","BiTRRT_smac"]
+        self.planners = ["RRTC","RRTC_smac","KPIECE","KPIECE_smac"]
+        self.planners = ["BIT","BIT_smac"]
 
-        self.plan_iterations = 100
+        self.plan_iterations = 20
              
         #Object Publishers, can alsu use PlanningSceneInterface, but this doesn throw any warnings
         self.object_publisher = rospy.Publisher('/collision_object',
@@ -117,9 +124,12 @@ class UR5_Benchmark():
             scene = {"name":scene_name}         #create scene dict
             query_count = 0             
             for x2 in xrange(len(self.states)):
+            # for x2 in range(0,5):
                 start = self.states[x2]
                 for x3 in range (x2+1, len(self.states)):         #loops to decide start and goal states
-                    goal = self.states[x3]                            
+                # for x3 in range(5,10):         #loops to decide start and goal states
+                    # goal = self.states[x3]                          
+                    goal = self.states[x3]
                                         
                     query = {"start":start, "goal":goal}        #create query dict
                     
@@ -130,7 +140,6 @@ class UR5_Benchmark():
                         planner_results = {"name":planner_name}     #create new planner dict
                         for it in range (0, self.plan_iterations):                                        
                             planner_results[it] = self.plan_path(start,goal)    #plan path and add results to planner dict    
-                        
                         query[x4] = planner_results                         #add planner dict to query dict
                     scene[query_count] = query                  #add query dict to scene dict
                     query_count += 1
@@ -250,15 +259,17 @@ class UR5_Benchmark():
         information, succes bit, and path lengths (both config and workspace)"""    
         
         start_state = self.robot.get_current_state()
-        start_state.joint_state.position = start
-        self.group.set_start_state(start_state)   #needs RobotState type, so fetch current state and change position   
 
-        self.group.set_joint_value_target(goal)     #takes a list as input
+        start_state.joint_state.position = start
+
+        self.group.set_start_state(start_state)   #needs RobotState type, so fetch current state and change position  
+        # self.group.set_joint_value_target(goal[:-1])     #takes a list as input
+        self.group.set_joint_value_target(goal)
         
         start = time.time()*1000                # *1000 to get millisecond
         planned_path = self.group.plan()
         end = time.time()*1000
-        
+
         success = 0
         length = 0
         if len(planned_path.joint_trajectory.points) != 0:      #not sure how to figure out a failure otherwise
@@ -267,8 +278,8 @@ class UR5_Benchmark():
                 
         runtime = end-start
         result = {"path":planned_path, "time":runtime, "length":length, "success":success}  
-        #note that planned_path is a special moveit msg type! moveit_msgs/RobotTrajectory Message!!! 
-        
+        #note that planned_path is a moveit msg type! moveit_msgs/RobotTrajectory Message!!! 
+
         return result
                 
     
@@ -288,22 +299,25 @@ class UR5_Benchmark():
         a = numpy.array(pts[0].positions)           #numpy array for easy norm calc
         b = numpy.array(pts[num_pts-1].positions)
         
-        a1 = numpy.array(self.get_forward_kinematics(a))    #get 3D fwd kinematics coordinates
-        b1 = numpy.array(self.get_forward_kinematics(b))
+        # a1 = numpy.array(self.get_forward_kinematics(a))    #get 3D fwd kinematics coordinates
+        # b1 = numpy.array(self.get_forward_kinematics(b))
 
         j_straight = numpy.linalg.norm((a - b), ord=2)
-        w_straight = numpy.linalg.norm((a1 - b1), ord=2)
+        
+        # w_straight = numpy.linalg.norm((a1 - b1), ord=2)
+        w_straight = 0
       
         for x in xrange(num_pts-1):
             
             a = numpy.array(pts[x].positions)
             b = numpy.array(pts[x+1].positions)
             
-            a1 = numpy.array(self.get_forward_kinematics(a))
-            b1 = numpy.array(self.get_forward_kinematics(b))
+            # a1 = numpy.array(self.get_forward_kinematics(a))
+            # b1 = numpy.array(self.get_forward_kinematics(b))
             
             j_length += numpy.linalg.norm((a - b), ord=2)
-            w_length += numpy.linalg.norm((a1 - b1), ord=2)
+            # w_length += numpy.linalg.norm((a1 - b1), ord=2)
+            w_length += 0
                         
         lengths = {'joint_path':j_length, 'joint_straight':j_straight, 'work_path':w_length, 'work_straight': w_straight}
         return lengths
