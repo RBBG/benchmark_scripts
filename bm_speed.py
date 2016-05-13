@@ -52,8 +52,10 @@ class UR5_Benchmark():
         self.planners = ["BiTRRT","BiTRRT_smac"]
         self.planners = ["RRTC","RRTC_smac","KPIECE","KPIECE_smac"]
         self.planners = ["BIT","BIT_smac"]
+        
+        self.planners = ["BKPIECE_smac"]
 
-        self.plan_iterations = 20
+        self.plan_iterations = 100
              
         #Object Publishers, can alsu use PlanningSceneInterface, but this doesn throw any warnings
         self.object_publisher = rospy.Publisher('/collision_object',
